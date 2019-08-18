@@ -47,7 +47,7 @@ void loop()
   //porta 5000 do protocolo TCP, deve ser a mesma utilizada pelo servidor
   const uint16_t port = 9999;
   //endereço ip, deve ser o mesmo utilizado pelo servidor
-  const char * host = "10.13.46.238";
+  const char * host = "10.94.15.69";
 
   //inicializa a lib do cliente
   WiFiClient client;
@@ -57,11 +57,16 @@ void loop()
   {
     escreva("Falha...", 1000);
     return;
-  }else{  
-    Serial.println("OKOK");
-    //transmite esta msg
-    client.println("Hello World");  
-    delay(500);
+  }else{
+    client.println(" ");
+    client.println("local");
+    client.println("Temperatura"); 
+    client.println("Corrente"); 
+    client.println("Umidade"); 
+    client.println("Data"); 
+    client.println("Horario"); 
+    client.println("fim"); 
+    delay(10000);
   }
 }
 
