@@ -1,6 +1,6 @@
 #include <dht.h>   //biblioteca do sensor de umidade e temperatura
 
-#define dht_pin 7  //pino de sinal do dht11 ligado no digital 5
+#define dht_pin 7  //pino de sinal do dht12 ligado no digital 7
 #define pinSensorRefletancia  8 //PINO DIGITAL UTILIZADO PELO MÓDULO
 #define ldrPin 0 //LDR no pino analígico 8
 #define pinLed 52
