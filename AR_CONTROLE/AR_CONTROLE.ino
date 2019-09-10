@@ -1,4 +1,4 @@
-[17:21, 09/09/2019] Samuel Santos: #include <IRac.h>
+  #include <IRac.h>
   #include <IRrecv.h>
   #include <IRremoteESP8266.h>
   #include <IRsend.h>
@@ -8,9 +8,7 @@
   #include <ESP8266WiFiMulti.h>//lib para as funções addAP e  run
   #include <SPI.h>  //protocolo síncrono de dados serial
   LiquidCrystal_I2C lcd(0x27, 16, 2);
-
-
- // =============================================================================================================
+// =============================================================================================================
 // --- Declaração de Objetos ---
   IRsend irsend(IrLed);
   IRrecv irrecv(IR_Recv);
