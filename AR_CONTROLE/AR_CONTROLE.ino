@@ -94,65 +94,65 @@
   bool set_Ar(int set){
     bool ok = true; 
     switch(set) {
-      case 0:{
-      irsend.sendRaw(powerOffRawData, 199, 38);
-      set_Display("Desligando....");
-      delay(1000);
-      set_Display("Desligado");
-      break;
+      case 0:{ //Comando de desligar
+        irsend.sendRaw(powerOffRawData, 199, 38);
+        set_Display("Desligando....");
+        delay(1000);
+        set_Display("Desligado");
+        break;
       }
-      case 1:{
-      irsend.sendRaw(powerOnRawData, 199, 38);
-      set_Display("Ligando...");
-      delay(1000);
-      set_Display("Temperatura: 22");
-      break;
+      case 1:{ //comando de Ligar
+        irsend.sendRaw(powerOnRawData, 199, 38);
+        set_Display("Ligando...");
+        delay(1000);
+        set_Display("Temperatura: 22");
+        break;
       }
-      case 17:{
-      irsend.sendRaw(set17RawData, 199, 38);
-      set_Display("Temperatura: 17");
-      break;
+      case 17:{ //Setando temp para 17 
+        irsend.sendRaw(set17RawData, 199, 38);
+        set_Display("Temperatura: 17");
+        break;
       }
-      case 18:{
-      irsend.sendRaw(set18RawData, 199, 38);
-      set_Display("Temperatura: 18");
-      break;
+      case 18:{ //Setando temp para 18
+        irsend.sendRaw(set18RawData, 199, 38);
+        set_Display("Temperatura: 18");
+        break;
       }
-      case 19:{
-      irsend.sendRaw(set19RawData, 199, 38);
-      set_Display("Temperatura: 19");
-      break;
-      }case 20:{
-      irsend.sendRaw(set20RawData, 199, 38);
-      set_Display("Temperatura: 20");
-      break;
+      case 19:{ //Setando temp para 19
+        irsend.sendRaw(set19RawData, 199, 38);
+        set_Display("Temperatura: 19");
+        break;
+      }case 20:{  //Setando temp para 20
+        irsend.sendRaw(set20RawData, 199, 38);
+        set_Display("Temperatura: 20");
+        break;
       }
-      case 21:{
-      irsend.sendRaw(set21RawData, 199, 38);
-      set_Display("Temperatura: 21");
-      break;
+      case 21:{  //Setando temp para 21
+        irsend.sendRaw(set21RawData, 199, 38);
+        set_Display("Temperatura: 21");
+        break;
       }
-      case 22:{
-      irsend.sendRaw(set22RawData, 199, 38);
-      set_Display("Temperatura: 22");
-      break;
+      case 22:{  //Setando temp para 22
+        irsend.sendRaw(set22RawData, 199, 38);
+        set_Display("Temperatura: 22");
+        break;
       }
-      case 23:{
-      irsend.sendRaw(set23RawData, 199, 38);
-      set_Display("Temperatura: 23");
-      break;
+      case 23:{  //Setando temp para 23
+        irsend.sendRaw(set23RawData, 199, 38);
+        set_Display("Temperatura: 23");
+        break;
       }
-      case 24:{
-      irsend.sendRaw(set24RawData, 199, 38);
-      set_Display("Temperatura: 24");
-      break;
+      case 24:{  //Setando temp para 24
+        irsend.sendRaw(set24RawData, 199, 38);
+        set_Display("Temperatura: 24");
+        break;
       }
-      case 25:{
-      irsend.sendRaw(set25RawData, 199, 38);
-      set_Display("Temperatura: 24");
-      break;
+      case 25:{  //Setando temp para 25
+        irsend.sendRaw(set25RawData, 199, 38);
+        set_Display("Temperatura: 24");
+        break;
       }
-      default: {
+      default: {  //Nenhuma das opcoes Anteriores
         set_Display("Comando Invalido... :(");
         delay(1000);
         set_Display("Temperatura: " + String(temp_atual));
@@ -164,7 +164,7 @@
     return ok;
   }
   
-  void set_Display(String msg){
+  void set_Display(String msg){ //Printa no display uma msg passada por parametro
     lcd.clear();
     for(int i = 0; i < msg.length(); i++ ) {
       lcd.setCursor(i, 0);
@@ -184,6 +184,7 @@
    if (irrecv.decode(&results))   {  //decodificamos a entrada do receptor infravermelho
      
       switch (results.value) {
+        
         case 16720605: { //ligar (seta esquerda) 
         temp_atual = 22;
         set_Ar(1);
