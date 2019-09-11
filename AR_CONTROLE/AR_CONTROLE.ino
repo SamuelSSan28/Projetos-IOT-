@@ -1,21 +1,6 @@
-  #include <IRac.h>
-  #include <IRrecv.h>
-  #include <IRremoteESP8266.h>
-  #include <IRsend.h>
-  #include <Wire.h>
-  #include <LiquidCrystal_I2C.h>
-  #include <ESP8266WiFi.h> //lib para conectar o wifi do ESP201
-  #include <ESP8266WiFiMulti.h>//lib para as funções addAP e  run
-  #include <SPI.h>  //protocolo síncrono de dados serial
-  LiquidCrystal_I2C lcd(0x27, 16, 2);
 // =============================================================================================================
-// --- Declaração de Objetos ---
-  IRsend irsend(IrLed);
-  IRrecv irrecv(IR_Recv);
-  decode_results results;
-  ESP8266WiFiMulti WiFiMulti; //cria uma instância da classe ESP8266WiFiMulti
-  IPAddress local_IP(192, 168, 10, 110); //Cria uma instância da classe IPAd…
-[19:44, 09/09/2019] Samuel Santos: #include <IRac.h>
+// --- Declaração de Bibilotecas ---  
+  #include <IRac.h>
   #include <IRrecv.h>
   #include <IRremoteESP8266.h>
   #include <IRsend.h>
@@ -31,7 +16,7 @@
   int IR_Recv = 14 ;   // Receptor Infravermelho (IR)
   const  uint16_t IrLed = 12 ; // Emissor Infravermelho (IR)
   int temp_atual;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 //Valores Hexadecimais
+  bool Ligando,Desligando;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 //Valores Hexadecimais
   //Raw responsavel por cada sinal enviado do emissor IR ao A/C
   uint16_t powerOffRawData[199] = {4370, 4374,  512, 1662,  512, 576,  514, 1684,  488, 1660,  514, 576,  514, 576,  514, 1684,  488, 580,  538, 548,  514, 1660,  512, 576,  514, 576,  514, 1660,  514, 1658,  514, 576,  514, 1660,  540, 548,  514, 1662,  512, 1684,  488, 1660,  512, 1658,  514, 576,  514, 1658,  514, 1662,  536, 1634,  510, 576,  514, 576,  514, 576,  514, 576,  514, 1684,  490, 576,  514, 578,  538, 1634,  512, 1660,  512, 1662,  510, 576,  514, 576,  514, 576,  514, 576,  514, 578,  540, 548,  514, 576,  514, 574,  514, 1658,  514, 1658,  516, 1658,  514, 1660,  512, 1658,  540, 5194,  4372, 4352,  514, 1660,  512, 576,  514, 1660,  514, 1660,  510, 576,  514, 576,  514, 1660,  512, 578,  538, 550,  514, 1660,  512, 576,  514, 576,  514, 1660,  512, 1684,  490, 574,  514, 1660,  538, 550,  514, 1660,  512, 1660,  512, 1658,  514, 1684,  488, 574,  514, 1660,  512, 1660,  538, 1632,  512, 576,  514, 576,  514, 576,  514, 576,  514, 1660,  512, 576,  514, 578,  538, 1656,  488, 1660,  512, 1684,  488, 576,  514, 576,  514, 576,  514, 578,  512, 578,  538, 550,  514, 576,  514, 576,  514, 1660,  512, 1684,  488, 1660,  512, 1660,  512, 1662,  536};  // COOLIX B27BE0
   uint16_t powerOnRawData[199] =  {4372, 4350,  514, 1660,  512, 576,  514, 1658,  514, 1658,  514, 576,  514, 576,  514, 1658,  514, 578,  518, 570,  512, 1684,  490, 574,  514, 576,  514, 1658,  512, 1684,  490, 576,  514, 1660,  538, 550,  514, 576,  514, 576,  514, 1660,  512, 1660,  512, 1682,  490, 1682,  488, 1662,  538, 1632,  512, 1662,  510, 1684,  490, 576,  514, 576,  514, 576,  514, 576,  514, 578,  538, 550,  512, 1662,  512, 1684,  488, 1662,  510, 1660,  512, 576,  514, 576,  514, 576,  538, 1632,  514, 576,  514, 576,  514, 576,  514, 576,  514, 1660,  512, 1662,  510, 1658,  540, 5190,  4374, 4352,  514, 1658,  512, 576,  514, 1658,  514, 1660,  514, 574,  514, 576,  514, 1684,  488, 578,  530, 558,  514, 1658,  512, 576,  514, 576,  516, 1658,  514, 1660,  512, 576,  514, 1662,  536, 550,  514, 576,  514, 576,  514, 1684,  488, 1658,  514, 1660,  514, 1656,  514, 1662,  536, 1634,  512, 1660,  512, 1658,  512, 576,  514, 574,  514, 576,  514, 574,  514, 578,  538, 550,  514, 1660,  510, 1684,  490, 1658,  514, 1660,  514, 576,  514, 576,  514, 578,  516, 1680,  490, 576,  512, 578,  514, 576,  514, 576,  514, 1660,  512, 1682,  490, 1660,  540};  // COOLIX B21F78
@@ -68,7 +53,7 @@
   WiFi.mode(WIFI_STA);
 
   //escreve no display "Definindo rede"
-  escreva("Definindo rede",1000);
+  set_Display("Definindo rede");
   
   //parametros: WiFi.softAP(nomeDoAccessPoint, senhaRede)
   //redeVisivel: a rede pode ou não aparecer para outros serviços 
@@ -76,83 +61,83 @@
   
   //enquanto o cliente não estiver conectado, escreve "."
   while (WiFiMulti.run() != WL_CONNECTED) 
-  escreva(".", 1000);
+   set_Display(".");
 
   //escreve no display "Pronto"
-  escreva("CONECTADO!",1000);
+   set_Display("CONECTADO!");
 
   //escreve no display "Endereco IP:"
-  escreva("Endereco IP:",1000);
+   set_Display("Endereco IP:");
     
   //escreve no display o ip local
-  escreva(WiFi.localIP().toString(), 1000);
+   set_Display(WiFi.localIP().toString());
   
   //escreve no display "Conectando Com servidor..."
-  escreva("Conectando Com servidor...",1000);
+   set_Display("Conectando Com servidor...");
   }
 
-  bool set_Ar(int set){
+  void set_Ar(int set){
     bool ok = true; 
     switch(set) {
-      case 0:{ //Comando de desligar
-        irsend.sendRaw(powerOffRawData, 199, 38);
-        set_Display("Desligando....");
-        delay(1000);
-        set_Display("Desligado");
-        break;
+      case 0:{
+      irsend.sendRaw(powerOffRawData, 199, 38);
+      set_Display("Desligando....");
+      delay(1000);
+      set_Display("Desligado");
+      break;
       }
-      case 1:{ //comando de Ligar
-        irsend.sendRaw(powerOnRawData, 199, 38);
-        set_Display("Ligando...");
-        delay(1000);
-        set_Display("Temperatura: 22");
-        break;
+      case 1:{
+      irsend.sendRaw(powerOnRawData, 199, 38);
+      set_Display("Ligando...");
+      delay(1000);
+      set_Display("Temperatura: 22");
+      break;
       }
-      case 17:{ //Setando temp para 17 
-        irsend.sendRaw(set17RawData, 199, 38);
-        set_Display("Temperatura: 17");
-        break;
+      case 17:{
+      irsend.sendRaw(set17RawData, 199, 38);
+      set_Display("Temperatura: 17");
+      break;
       }
-      case 18:{ //Setando temp para 18
-        irsend.sendRaw(set18RawData, 199, 38);
-        set_Display("Temperatura: 18");
-        break;
+      case 18:{
+      irsend.sendRaw(set18RawData, 199, 38);
+      set_Display("Temperatura: 18");
+      break;
       }
-      case 19:{ //Setando temp para 19
-        irsend.sendRaw(set19RawData, 199, 38);
-        set_Display("Temperatura: 19");
-        break;
-      }case 20:{  //Setando temp para 20
-        irsend.sendRaw(set20RawData, 199, 38);
-        set_Display("Temperatura: 20");
-        break;
+      case 19:{
+      irsend.sendRaw(set19RawData, 199, 38);
+      set_Display("Temperatura: 19");
+      break;
+      }case 20:{
+      irsend.sendRaw(set20RawData, 199, 38);
+      set_Display("Temperatura: 20");
+      break;
       }
-      case 21:{  //Setando temp para 21
-        irsend.sendRaw(set21RawData, 199, 38);
-        set_Display("Temperatura: 21");
-        break;
+      case 21:{
+      irsend.sendRaw(set21RawData, 199, 38);
+      set_Display("Temperatura: 21");
+      break;
       }
-      case 22:{  //Setando temp para 22
-        irsend.sendRaw(set22RawData, 199, 38);
-        set_Display("Temperatura: 22");
-        break;
+      case 22:{
+      irsend.sendRaw(set22RawData, 199, 38);
+      set_Display("Temperatura: 22");
+      break;
       }
-      case 23:{  //Setando temp para 23
-        irsend.sendRaw(set23RawData, 199, 38);
-        set_Display("Temperatura: 23");
-        break;
+      case 23:{
+      irsend.sendRaw(set23RawData, 199, 38);
+      set_Display("Temperatura: 23");
+      break;
       }
-      case 24:{  //Setando temp para 24
-        irsend.sendRaw(set24RawData, 199, 38);
-        set_Display("Temperatura: 24");
-        break;
+      case 24:{
+      irsend.sendRaw(set24RawData, 199, 38);
+      set_Display("Temperatura: 24");
+      break;
       }
-      case 25:{  //Setando temp para 25
-        irsend.sendRaw(set25RawData, 199, 38);
-        set_Display("Temperatura: 24");
-        break;
+      case 25:{
+      irsend.sendRaw(set25RawData, 199, 38);
+      set_Display("Temperatura: 24");
+      break;
       }
-      default: {  //Nenhuma das opcoes Anteriores
+      default: {
         set_Display("Comando Invalido... :(");
         delay(1000);
         set_Display("Temperatura: " + String(temp_atual));
@@ -161,10 +146,9 @@
     
     }
 
-    return ok;
   }
   
-  void set_Display(String msg){ //Printa no display uma msg passada por parametro
+  void set_Display(String msg){
     lcd.clear();
     for(int i = 0; i < msg.length(); i++ ) {
       lcd.setCursor(i, 0);
@@ -184,16 +168,16 @@
    if (irrecv.decode(&results))   {  //decodificamos a entrada do receptor infravermelho
      
       switch (results.value) {
-        
         case 16720605: { //ligar (seta esquerda) 
         temp_atual = 22;
         set_Ar(1);
+        Ligando = true;
         break;
       }
       
       case 16761405:{   //desligar (seta direita)
-        temp_atual = -1;
         set_Ar(0);
+        Desligando = true;
         break;
       }
   
@@ -223,21 +207,24 @@
         break;
       }
     }
-  
+
    
-   if (!client.connect(host, port))    {    //Envioda temperatura atual
+   if (!client.connect(host, port))    {    //Envio da temperatura atual
       Serial.println("Falha...");
       return;
     }else{
       client.println(" ");
-      client.println("Disnel - Controle");
+      client.println("0");
+      client.println("Controle");
       client.println(temp_atual); 
-      client.println("-1.0"); 
-      client.println("-1.0"); 
+      client.println(String(Ligando)); 
+      client.println(String(Desligando)); 
       client.println("fim"); 
+      Ligando = false;
+      Desligando = false;
     }
    }
-  delay(1000);
+  delay(2000);
   irrecv.resume(); // Recebe o proximo valor do botÃ£o que pressionamos
   }
 
