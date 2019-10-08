@@ -1,6 +1,4 @@
-// =============================================================================================================
-// --- Declaração de Bibilotecas ---  
-  #include <IRac.h>
+#include <IRac.h>
   #include <IRrecv.h>
   #include <IRremoteESP8266.h>
   #include <IRsend.h>
@@ -13,10 +11,12 @@
 
 // =============================================================================================================
 // --- Declaração de Constantes ---
-  int IR_Recv = 14 ;   // Receptor Infravermelho (IR)
-  const  uint16_t IrLed = 12 ; // Emissor Infravermelho (IR)
-  int temp_atual;
-  bool on_off = false;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                //Valores Hexadecimais
+  int IR_Recv = 14;   //Receptor Infravermelho (IR)
+  int temp_atual = 22;
+  bool on_off = false;
+  int msg_Server = 0;
+  bool erro = false;
+   const uint16_t IrLed = 12; //Emissor Infravermelho (IR)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  //Valores Hexadecimais
   //Raw responsavel por cada sinal enviado do emissor IR ao A/C
   uint16_t powerOffRawData[199] = {4370, 4374,  512, 1662,  512, 576,  514, 1684,  488, 1660,  514, 576,  514, 576,  514, 1684,  488, 580,  538, 548,  514, 1660,  512, 576,  514, 576,  514, 1660,  514, 1658,  514, 576,  514, 1660,  540, 548,  514, 1662,  512, 1684,  488, 1660,  512, 1658,  514, 576,  514, 1658,  514, 1662,  536, 1634,  510, 576,  514, 576,  514, 576,  514, 576,  514, 1684,  490, 576,  514, 578,  538, 1634,  512, 1660,  512, 1662,  510, 576,  514, 576,  514, 576,  514, 576,  514, 578,  540, 548,  514, 576,  514, 574,  514, 1658,  514, 1658,  516, 1658,  514, 1660,  512, 1658,  540, 5194,  4372, 4352,  514, 1660,  512, 576,  514, 1660,  514, 1660,  510, 576,  514, 576,  514, 1660,  512, 578,  538, 550,  514, 1660,  512, 576,  514, 576,  514, 1660,  512, 1684,  490, 574,  514, 1660,  538, 550,  514, 1660,  512, 1660,  512, 1658,  514, 1684,  488, 574,  514, 1660,  512, 1660,  538, 1632,  512, 576,  514, 576,  514, 576,  514, 576,  514, 1660,  512, 576,  514, 578,  538, 1656,  488, 1660,  512, 1684,  488, 576,  514, 576,  514, 576,  514, 578,  512, 578,  538, 550,  514, 576,  514, 576,  514, 1660,  512, 1684,  488, 1660,  512, 1660,  512, 1662,  536};  // COOLIX B27BE0
   uint16_t powerOnRawData[199] =  {4372, 4350,  514, 1660,  512, 576,  514, 1658,  514, 1658,  514, 576,  514, 576,  514, 1658,  514, 578,  518, 570,  512, 1684,  490, 574,  514, 576,  514, 1658,  512, 1684,  490, 576,  514, 1660,  538, 550,  514, 576,  514, 576,  514, 1660,  512, 1660,  512, 1682,  490, 1682,  488, 1662,  538, 1632,  512, 1662,  510, 1684,  490, 576,  514, 576,  514, 576,  514, 576,  514, 578,  538, 550,  512, 1662,  512, 1684,  488, 1662,  510, 1660,  512, 576,  514, 576,  514, 576,  538, 1632,  514, 576,  514, 576,  514, 576,  514, 576,  514, 1660,  512, 1662,  510, 1658,  540, 5190,  4374, 4352,  514, 1658,  512, 576,  514, 1658,  514, 1660,  514, 574,  514, 576,  514, 1684,  488, 578,  530, 558,  514, 1658,  512, 576,  514, 576,  516, 1658,  514, 1660,  512, 576,  514, 1662,  536, 550,  514, 576,  514, 576,  514, 1684,  488, 1658,  514, 1660,  514, 1656,  514, 1662,  536, 1634,  512, 1660,  512, 1658,  512, 576,  514, 574,  514, 576,  514, 574,  514, 578,  538, 550,  514, 1660,  510, 1684,  490, 1658,  514, 1660,  514, 576,  514, 576,  514, 578,  516, 1680,  490, 576,  512, 578,  514, 576,  514, 576,  514, 1660,  512, 1682,  490, 1660,  540};  // COOLIX B21F78
@@ -32,7 +32,7 @@
 // =============================================================================================================
 
 
-// =============================================================================================================
+ // =============================================================================================================
 // --- Declaração de Objetos ---
   IRsend irsend(IrLed);
   IRrecv irrecv(IR_Recv);
@@ -41,26 +41,17 @@
   IPAddress local_IP(192, 168, 10, 110); //Cria uma instância da classe IPAddress e define o ip do servidor
 // =============================================================================================================
 
-  void set_Display(String msg){
-    lcd.clear();
-    for(int i = 0; i < msg.length(); i++ ) {
-      lcd.setCursor(i, 0);
-      lcd.print(msg.charAt(i));
-    }
-  }
+
   void setup() {
+    Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);
     irrecv.enableIRIn(); //inicia o receptor infravermelho (IR)
     irsend.begin();
     lcd.begin(16, 2);
     lcd.init();
     lcd.backlight();
 
-    Serial.begin(9600);
     //configura modo como estação
     WiFi.mode(WIFI_STA);
-  
-    //escreve no display "Definindo rede"
-    escreva("Definindo rede");
     
     //parametros: WiFi.softAP(nomeDoAccessPoint, senhaRede)
     //redeVisivel: a rede pode ou não aparecer para outros serviços 
@@ -68,175 +59,171 @@
     
     //enquanto o cliente não estiver conectado, escreve "."
     while (WiFiMulti.run() != WL_CONNECTED) 
-     escreva(".");
-       
-    //escreve no display "Pronto"
-     escreva("CONECTAD NA REDE!");
-  
-    //escreve no display "Endereco IP:"
-     escreva("Endereco IP:");
-      
-    //escreve no display o ip local
-     escreva(WiFi.localIP().toString());
-    
-    //escreve no display "Conectando Com servidor..."
-     escreva("Esperandos servidor...");
-  
-     set_Display("Desligado!");
-     irrecv.resume(); // Recebe o proximo valor do botÃ£o que pressionamos
+     Serial.print(".");
+
+    set_Display("Desligado");
   }
 
-  void set_Ar(int set){
-    bool ok = true; 
+  void set_Ar(int set){ 
     switch(set) {
       case 0:{
-        irsend.sendRaw(powerOffRawData, 199, 38);
-        set_Display("Desligando....");
-        delay(1000);
-        set_Display("Desligado");
-        break;
+      irsend.sendRaw(powerOffRawData, 199, 38);
+      set_Display("Desligando....");
+      delay(1000);
+      set_Display("Desligado");
+      break;
       }
       case 1:{
-        irsend.sendRaw(powerOnRawData, 199, 38);
-        set_Display("Ligando...");
-        delay(1000);
-        set_Display("Temperatura: 22");
-        break;
+      irsend.sendRaw(powerOnRawData, 199, 38);
+      set_Display("Ligando...");
+      delay(1000);
+      set_Display("Temperatura: 22");
+      break;
       }
       case 17:{
-        irsend.sendRaw(set17RawData, 199, 38);
-        set_Display("Temperatura: 17");
-        break;
+      irsend.sendRaw(set17RawData, 199, 38);
+      set_Display("Temperatura: 17");
+      break;
       }
       case 18:{
-        irsend.sendRaw(set18RawData, 199, 38);
-        set_Display("Temperatura: 18");
-        break;
+      irsend.sendRaw(set18RawData, 199, 38);
+      set_Display("Temperatura: 18");
+      break;
       }
       case 19:{
-        irsend.sendRaw(set19RawData, 199, 38);
-        set_Display("Temperatura: 19");
-        break;
+      irsend.sendRaw(set19RawData, 199, 38);
+      set_Display("Temperatura: 19");
+      break;
       }case 20:{
-        irsend.sendRaw(set20RawData, 199, 38);
-        set_Display("Temperatura: 20");
-        break;
+      irsend.sendRaw(set20RawData, 199, 38);
+      set_Display("Temperatura: 20");
+      break;
       }
       case 21:{
-        irsend.sendRaw(set21RawData, 199, 38);
-        set_Display("Temperatura: 21");
-        break;
+      irsend.sendRaw(set21RawData, 199, 38);
+      set_Display("Temperatura: 21");
+      break;
       }
       case 22:{
-        irsend.sendRaw(set22RawData, 199, 38);
-        set_Display("Temperatura: 22");
-        break;
+      irsend.sendRaw(set22RawData, 199, 38);
+      set_Display("Temperatura: 22");
+      break;
       }
       case 23:{
-        irsend.sendRaw(set23RawData, 199, 38);
-        set_Display("Temperatura: 23");
-        break;
+      irsend.sendRaw(set23RawData, 199, 38);
+      set_Display("Temperatura: 23");
+      break;
       }
       case 24:{
-        irsend.sendRaw(set24RawData, 199, 38);
-        set_Display("Temperatura: 24");
-        break;
+      irsend.sendRaw(set24RawData, 199, 38);
+      set_Display("Temperatura: 24");
+      break;
       }
       case 25:{
-        irsend.sendRaw(set25RawData, 199, 38);
-        set_Display("Temperatura: 25");
-        break;
-      }
-      default: {
-        set_Display("Comando Invalido... :(");
-        delay(1000);
-        set_Display("Temperatura: " + String(temp_atual));
-        break;
+      irsend.sendRaw(set25RawData, 199, 38);
+      set_Display("Temperatura: 25");
+      break;
       }
     
     }
-
   }
   
-    
+  void set_Display(String msg){
+    lcd.clear();
+    for(int i = 0; i < msg.length(); i++ ) {
+      lcd.setCursor(i, 0);
+      lcd.print(msg.charAt(i));
+    }
+ }
  
   void loop() {
     //porta 5000 do protocolo TCP, deve ser a mesma utilizada pelo servidor
     const uint16_t port = 9999;
     //endereço ip, deve ser o mesmo utilizado pelo servidor
     const char * host = "10.94.15.69";
+  
+    //inicializa a lib do cliente
+    WiFiClient client;
 
-  //inicializa a lib do cliente
-  WiFiClient client;
-
+   if(msg_Server > 0 and msg_Server <= 4){
+      set_Ar(0);   
+    }  
    if (irrecv.decode(&results))   {  //decodificamos a entrada do receptor infravermelho
       switch (results.value) {
         case 16720605: { //ligar (seta esquerda) 
           if(!on_off){
             temp_atual = 22;
             set_Ar(1);
-            on_off = false;
-          }          
+            on_off = true;
+          }else{
+            set_Display("ERRO: Ta Ligado");
+            delay(500);
+            set_Display("Temperatura: "+String(temp_atual));
+            erro = true;
+          }
         break;
       }
       
       case 16761405:{   //desligar (seta direita)
         if(on_off){
           set_Ar(0);
-          on_off = true;
+          on_off = false;
+        }else{
+            set_Display("ERRO: Ta Desligado");
+            delay(500);
+            set_Display("Temperatura: "+String(temp_atual));
+            erro = true;
         }
         break;
       }
   
       case 16736925:   { //seta pra cima
-        if((temp_atual +1) <= 25){
-            temp_atual = temp_atual + 1;
-            set_Ar(temp_atual);
-        }else{
-          set_Display("Comando Invalido... :(");
-          delay(1000);
-          set_Display("Temperatura: " + String(temp_atual));  
-        }
+        if(on_off and temp_atual < 25){
+          temp_atual = temp_atual + 1;
+          set_Ar(temp_atual);
+          }else{
+           set_Display("ERRO: Temp MAX");
+            delay(500);
+            set_Display("Temperatura: "+String(temp_atual));
+            erro = true;
+          }
+        
   
         break;
       }
   
       case 16754775:  {//seta pra baixo
-        if((temp_atual -1) >= 17){
-            temp_atual = temp_atual - 1;
-            set_Ar(temp_atual);
-        }else{
-          set_Display("Comando Invalido... :(");
-          delay(1000);
-          set_Display("Temperatura: " + String(temp_atual));  
-        }
+        if(on_off and temp_atual > 17){
+          temp_atual = temp_atual - 1;
+          set_Ar(temp_atual);
+         }else{
+          set_Display("ERRO: Temp MIN");
+            delay(500);
+            set_Display("Temperatura: "+String(temp_atual));
+            erro = true;
+          }
+        
   
-        break;
-      }default: {
-       set_Display("Comando InvalidoT... :(");
-       delay(1000);
-       set_Display("Temperatura: " + String(temp_atual));
         break;
       }
     }
-
-   if (!client.connect(host, port))    {    //Envio da temperatura atual
-      Serial.println("Falha...");
-    }else{
-      client.println(" ");
-      client.println("1"); //tipo
-      client.println("Disnel"); //Local
-      client.println(temp_atual); //temperatura
-      client.println(String(on_off)); 
-      client.println("fim"); 
-    }
-   }
-   delay(2000);
-   irrecv.resume(); // Recebe o proximo valor do botÃ£o que pressionamos
    
+   Serial.println(erro);
+   if (client.connect(host, port))    {    //Envioda temperatura atual
+    if(erro == false){
+      client.println(" ");
+          client.println("1"); //tipo
+          client.println("5"); //id
+          client.println(temp_atual); //temperatura
+          client.println(String(on_off));//estado
+          client.println("fim");
+      }
+         
+   }
+    
+    erro = false; 
+    irrecv.resume(); // Recebe o proximo valor do botÃ£o que pressionamos
+   }
+   
+  
   }
-
-  void escreva(String texto){
-  Serial.println(texto);
-  delay(1000);
-}
