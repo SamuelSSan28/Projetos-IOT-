@@ -35,93 +35,92 @@
   decode_results results;
   LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-  void setup() {
-    Serial.begin(9600);
-    irrecv.enableIRIn(); //inicia o receptor infravermelho (IR)
-    irsend.begin();
-    lcd.begin(16, 2);
-    lcd.init();
-    lcd.backlight();
-
-    //configura modo como estação
-    WiFi.mode(WIFI_STA);
-        
-    //parametros: WiFi.begin(nomeDoAccessPoint, senhaRede)
-    //redeVisivel: a rede pode ou não aparecer para outros serviços 
-    WiFi.begin("UFPI", "");
-
-    //enquanto o cliente não estiver conectado, escreve "."
-    while (WiFi.status() != WL_CONNECTED){
-      Serial.println("...");
-     delay(100);
-    }
-    set_Display("Desligado!");
+void setup() {
+  Serial.begin(9600);
+  irrecv.enableIRIn(); //inicia o receptor infravermelho (IR)
+  irsend.begin();
+  lcd.begin(16, 2);
+  lcd.init();
+  lcd.backlight();
+  
+  //configura modo como estação
+  WiFi.mode(WIFI_STA);
+      
+  //parametros: WiFi.begin(nomeDoAccessPoint, senhaRede)
+  //redeVisivel: a rede pode ou não aparecer para outros serviços 
+  WiFi.begin("UFPI", "");
+  
+  //enquanto o cliente não estiver conectado, escreve "."
+  while (WiFi.status() != WL_CONNECTED){
+    Serial.println("...");
+   delay(100);
+  }
+  set_Display("Desligado!");
   }
 
-  void set_Ar(int set){ 
-    switch(set) {
-      case 0:{
-        irsend.sendRaw(powerOffRawData, 199, 38);
-        set_Display("Desligando....");
-        delay(1000);
-        set_Display("Desligado");
-      break;
-      }
-      case 1:{
-        irsend.sendRaw(powerOnRawData, 199, 38);
-        set_Display("Ligando...");
-        delay(1000);
-        set_Display("Temperatura: 22");
-      break;
-      }
-      case 17:{
-        irsend.sendRaw(set17RawData, 199, 38);
-        set_Display("Temperatura: 17");
-       break;
-      }
-      case 18:{
-        irsend.sendRaw(set18RawData, 199, 38);
-        set_Display("Temperatura: 18");
-      break;
-      }
-      case 19:{
-        irsend.sendRaw(set19RawData, 199, 38);
-        set_Display("Temperatura: 19");
-      break;
-      }
-      case 20:{
-        irsend.sendRaw(set20RawData, 199, 38);
-        set_Display("Temperatura: 20");
-      break;
-      }
-      case 21:{
-        irsend.sendRaw(set21RawData, 199, 38);
-        set_Display("Temperatura: 21");
-      break;
-      }
-      case 22:{
-        irsend.sendRaw(set22RawData, 199, 38);
-        set_Display("Temperatura: 22");
-      break;
-      }
-      case 23:{
-        irsend.sendRaw(set23RawData, 199, 38);
-        set_Display("Temperatura: 23");
-      break;
-      }
-      case 24:{
-        irsend.sendRaw(set24RawData, 199, 38);
-        set_Display("Temperatura: 24");
-      break;
-      }
-      case 25:{
-        irsend.sendRaw(set25RawData, 199, 38);
-        set_Display("Temperatura: 25");
-      break;
-      }
-    
+void set_Ar(int set){ 
+  switch(set) {
+    case 0:{
+      irsend.sendRaw(powerOffRawData, 199, 38);
+      set_Display("Desligando....");
+      delay(1000);
+      set_Display("Desligado");
+    break;
+    }
+    case 1:{
+      irsend.sendRaw(powerOnRawData, 199, 38);
+      set_Display("Ligando...");
+      delay(1000);
+      set_Display("Temperatura: 22");
+    break;
+    }
+    case 17:{
+      irsend.sendRaw(set17RawData, 199, 38);
+      set_Display("Temperatura: 17");
+     break;
+    }
+    case 18:{
+      irsend.sendRaw(set18RawData, 199, 38);
+      set_Display("Temperatura: 18");
+    break;
+    }
+    case 19:{
+      irsend.sendRaw(set19RawData, 199, 38);
+      set_Display("Temperatura: 19");
+    break;
+    }
+    case 20:{
+      irsend.sendRaw(set20RawData, 199, 38);
+      set_Display("Temperatura: 20");
+    break;
+    }
+    case 21:{
+      irsend.sendRaw(set21RawData, 199, 38);
+      set_Display("Temperatura: 21");
+    break;
+    }
+    case 22:{
+      irsend.sendRaw(set22RawData, 199, 38);
+      set_Display("Temperatura: 22");
+    break;
+    }
+    case 23:{
+      irsend.sendRaw(set23RawData, 199, 38);
+      set_Display("Temperatura: 23");
+    break;
+    }
+    case 24:{
+      irsend.sendRaw(set24RawData, 199, 38);
+      set_Display("Temperatura: 24");
+    break;
+    }
+    case 25:{
+      irsend.sendRaw(set25RawData, 199, 38);
+      set_Display("Temperatura: 25");
+    break;
     }
   }
+}
   
   void set_Display(String msg){
     lcd.clear();
