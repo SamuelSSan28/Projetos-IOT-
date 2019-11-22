@@ -53,7 +53,7 @@ void setup(){
   dht.begin();                          //inicia a comunicação com o dht
   pinMode(pin_sct, INPUT);             //entrada para sensor de corrente
   //Pino, calibracao - Cur Const= Ratio/BurdenR. 2000/33 = 60
-  emon1.current(pin_sct, 60);
+  emon1.current(pin_sct, 39);
   
   Serial.begin(9600);
   //configura modo como estação
@@ -69,25 +69,28 @@ void setup(){
 }
 
 void loop() {
-  double Irms = emon1.calcIrms(1480);   //Calcula a corrente
+  double Irms = emon1.calcIrms(2000);   //Calcula a corrente
+  Serial.print("Corrente: " + String(Irms));
+  Serial.println("   Potencia: " + String(Irms * 234));
    temperatura = dht.readTemperature();
    umidade     = dht.readHumidity();
 
   WiFiClient client;  //inicializa a lib do cliente
   
   //se o cliente não estiver conectado, exibe "Falha..."
-  if (!client.connect(host, port)) 
-  {
+  if (!client.connect(host, port)) {
     escreva("Falha...", 1000);
+    client.stop();
     return;
   }else{
     client.println(" ");
-    client.println("0");
-    client.println(4);
+    client.println("0"); //tipo de node
+    client.println(4); //id do node
     client.println(temperatura); 
-    client.println(Irms); 
+    client.println(Irms); //Corrente 
     client.println(umidade); 
-    client.println("fim"); 
+    client.println("fim");
+    client.stop(); 
     delay(10000);
   }
 }
