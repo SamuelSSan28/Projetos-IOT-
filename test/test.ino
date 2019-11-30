@@ -10,7 +10,6 @@
   int IR_Recv = 14;   //Receptor Infravermelho (IR)
   int temp_atual = 22;
   bool on_off = false;
-  int msg_Server = 0;
   bool erro = false;
   const uint16_t port = 9999; //porta 5000 do protocolo TCP, deve ser a mesma utilizada pelo servidor
   const char *host = "10.94.15.69";  //endereço ip, deve ser o mesmo utilizado pelo servidor
@@ -131,8 +130,7 @@ void set_Ar(int set){
  }
  
   void loop() {
-    WiFiClient client;
-    
+  
    if (irrecv.decode(&results))   {  //decodificamos a entrada do receptor infravermelho
       switch (results.value) {
         case 16720605: { //ligar (seta esquerda) 
@@ -192,8 +190,8 @@ void set_Ar(int set){
     }
    
    if( erro == false){
+    WiFiClient client;
      if (client.connect(host, port)){
-        Serial.println("Conectou");
         client.println(" ");
         client.println("1"); //tipo
         client.println("5"); //id

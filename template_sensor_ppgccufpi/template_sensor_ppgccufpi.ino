@@ -24,10 +24,12 @@
 #define STAPSK  ""
 
 // --- Declaração de Constantes ---
-int IR_Recv = 14;   //Receptor Infravermelho (IR)
+int IR_Recv = 13;   //Receptor Infravermelho (IR)
 int estado_ant = 0;
-int estado = 1;
-const uint16_t IrLed = 12; //Emissor Infravermelho (IR) 
+int estado = 0;
+int temperatura = 22;
+int vem = 0;
+const uint16_t IrLed = 15; //Emissor Infravermelho (IR) 
 //Raw responsavel por cada sinal enviado do emissor IR ao A/C
 uint16_t powerOffRawData[199] = {4370, 4374,  512, 1662,  512, 576,  514, 1684,  488, 1660,  514, 576,  514, 576,  514, 1684,  488, 580,  538, 548,  514, 1660,  512, 576,  514, 576,  514, 1660,  514, 1658,  514, 576,  514, 1660,  540, 548,  514, 1662,  512, 1684,  488, 1660,  512, 1658,  514, 576,  514, 1658,  514, 1662,  536, 1634,  510, 576,  514, 576,  514, 576,  514, 576,  514, 1684,  490, 576,  514, 578,  538, 1634,  512, 1660,  512, 1662,  510, 576,  514, 576,  514, 576,  514, 576,  514, 578,  540, 548,  514, 576,  514, 574,  514, 1658,  514, 1658,  516, 1658,  514, 1660,  512, 1658,  540, 5194,  4372, 4352,  514, 1660,  512, 576,  514, 1660,  514, 1660,  510, 576,  514, 576,  514, 1660,  512, 578,  538, 550,  514, 1660,  512, 576,  514, 576,  514, 1660,  512, 1684,  490, 574,  514, 1660,  538, 550,  514, 1660,  512, 1660,  512, 1658,  514, 1684,  488, 574,  514, 1660,  512, 1660,  538, 1632,  512, 576,  514, 576,  514, 576,  514, 576,  514, 1660,  512, 576,  514, 578,  538, 1656,  488, 1660,  512, 1684,  488, 576,  514, 576,  514, 576,  514, 578,  512, 578,  538, 550,  514, 576,  514, 576,  514, 1660,  512, 1684,  488, 1660,  512, 1660,  512, 1662,  536};  // COOLIX B27BE0
 uint16_t powerOnRawData[199] =  {4372, 4350,  514, 1660,  512, 576,  514, 1658,  514, 1658,  514, 576,  514, 576,  514, 1658,  514, 578,  518, 570,  512, 1684,  490, 574,  514, 576,  514, 1658,  512, 1684,  490, 576,  514, 1660,  538, 550,  514, 576,  514, 576,  514, 1660,  512, 1660,  512, 1682,  490, 1682,  488, 1662,  538, 1632,  512, 1662,  510, 1684,  490, 576,  514, 576,  514, 576,  514, 576,  514, 578,  538, 550,  512, 1662,  512, 1684,  488, 1662,  510, 1660,  512, 576,  514, 576,  514, 576,  538, 1632,  514, 576,  514, 576,  514, 576,  514, 576,  514, 1660,  512, 1662,  510, 1658,  540, 5190,  4374, 4352,  514, 1658,  512, 576,  514, 1658,  514, 1660,  514, 574,  514, 576,  514, 1684,  488, 578,  530, 558,  514, 1658,  512, 576,  514, 576,  516, 1658,  514, 1660,  512, 576,  514, 1662,  536, 550,  514, 576,  514, 576,  514, 1684,  488, 1658,  514, 1660,  514, 1656,  514, 1662,  536, 1634,  512, 1660,  512, 1658,  512, 576,  514, 574,  514, 576,  514, 574,  514, 578,  538, 550,  514, 1660,  510, 1684,  490, 1658,  514, 1660,  514, 576,  514, 576,  514, 578,  516, 1680,  490, 576,  512, 578,  514, 576,  514, 576,  514, 1660,  512, 1682,  490, 1660,  540};  // COOLIX B21F78
@@ -44,6 +46,7 @@ uint16_t set25RawData[199] =    {4372, 4342,  514, 1656,  514, 576,  514, 1658, 
 // --- Declaração de Objetos ---
 IRsend irsend(IrLed);
 IRrecv irrecv(IR_Recv);
+decode_results results;
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 WiFiClient nodemcuClient;
@@ -59,6 +62,8 @@ const char* MQTT_PASSWORD = "mqtt_ufpi";
 PubSubClient client(nodemcuClient);
 const char* topicoEstado = "controleAc/Disnel/LD";
 const char* topicoTemperatura = "controleAc/Disnel/temperatura";
+const char* topicoEstadoBD = "controleAc/Disnel/estadoBD";
+const char* topicoTemperaturaBD = "controleAc/Disnel/temperaturaBD";
 
 // CONEXAO WIFI
 void conectarWifi() {
@@ -77,29 +82,56 @@ void reconectarMQTT() {
     client.connect(MQTT_ClientID,MQTT_USERNAME,MQTT_PASSWORD);
     client.subscribe(topicoEstado);
     client.subscribe(topicoTemperatura);
+    delay(1000);
   }
 }
 
-
-
 // PUBLICACAO DO VALOR ATUAL DA TEMPERATURA DO AR COONDICIONADO
 void publicarTemperaturaacNoTopico() {
-  //client.publish(topicoTemperatura, String(temperatura).c_str(), true);
-  //client.publish(topicoUmidade, String(umidade).c_str(), true);
+  client.publish("controleAc/Disnel/temperaturaApp", String(temperatura).c_str(), true);
+}
+
+// PUBLICACAO DO ESTADO ATUAL DO AR COONDICIONADO
+void publicarEstadoNoTopico() {
+  client.publish("controleAc/Disnel/LDApp", String(estado).c_str(), true);
+}
+
+// PUBLICACAO pro bd
+void publicarBD() {
+  if(estado != 0){
+    String msg = "1 " + String(temperatura);
+    client.publish("controleAc/Disnel/temp_est_bd", msg.c_str(), true);
+  }
+  if(estado == 0) {
+    String msg = "0 " + String(temperatura);
+    client.publish("controleAc/Disnel/temp_est_bd",msg.c_str(), true);
+  }
 }
 
 // RECEBENDO O VALOR ATUAL DA TEMPERATURA DO AR COONDICIONADO
 void callback(char* topic, byte* payload, unsigned int length) {
   String msg = "";
+  String topico = String(topic);
   Serial.print("Message arrived in topic: ");
-  Serial.println(topic);
   
   for (int i = 0; i < length; i++) {
       msg += ((char)payload[i]);
     }
+    
+  Serial.print(topic);
+  Serial.print(" : ");
+  Serial.println(msg);
 
- // Serial.print(msg);
+  estado_ant = estado;
   estado = msg.toInt();
+  
+  Serial.println("Atual e Anterior: "+String(estado)+" "+ String(estado_ant));
+  
+  if(estado > 1 and estado_ant == 0){
+    estado = estado_ant;
+    }
+  
+  vem = 0;
 }
 
 void set_Ar(int set){ 
@@ -174,7 +206,43 @@ void set_Display(String msg){
   }
 }
 
-
+void controle(){
+  if (irrecv.decode(&results))   { 
+    Serial.println("Sinal InfraRecebido");
+    vem = 1;
+    switch (results.value) {
+      case 16720605: { //ligar (seta esquerda)
+          estado_ant = estado;
+          estado = 1; 
+        break;
+      }
+      case 16761405:{   //desligar (seta direita) 
+          estado_ant = estado;
+          estado = 0;
+        
+        break;
+      }
+      case 16736925:   { //seta pra cima
+        if(estado > 0 and estado+1 < 26){
+          if(estado == 1) estado = temperatura;
+          estado_ant = estado;
+          estado++;
+        }
+        break;
+      }
+      case 16754775:  {//seta pra baixo
+         if(estado > 0 and estado-1 > 16){
+          if(estado == 1) estado = temperatura;
+          estado_ant = estado;
+          estado--;
+        }
+        break;
+      }
+     
+    }
+    irrecv.resume(); // Recebe o proximo valor do botÃ£o que pressionamos
+  }
+}
 void setup() {
   WiFi.hostname("esp-controle-node00");
   irrecv.enableIRIn(); //inicia o receptor infravermelho (IR)
@@ -183,31 +251,17 @@ void setup() {
   lcd.init();
   lcd.backlight();
   Serial.begin(115200);
-  conectarWifi();
   client.setServer(MQTT_BROKER, 1883);
   WiFi.mode(WIFI_STA);
   WiFi.begin(STASSID, STAPSK);
 
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print('_');
-    delay(500);
-  }
-
-  for (bool configured = true; !configured;) {
-    for (auto addr : addrList)
-      if ((configured = !addr.isLocal()
-                        && addr.isV6() //
-                        && addr.ifnumber() == STATION_IF
-          )) {
-        break;
-      }
-    Serial.print('.');
-    delay(500);
-  }
+  conectarWifi();
+  client.connect(MQTT_ClientID);
+  client.connect(MQTT_ClientID,MQTT_USERNAME,MQTT_PASSWORD);
   client.subscribe(topicoEstado);
   client.subscribe(topicoTemperatura);
   client.setCallback(callback);
-  Serial.print("OK");
+  Serial.println("OK");
   set_Display("Desligado!");
 }
 
@@ -215,13 +269,34 @@ void loop() {
  if (!client.connected()) {
     reconectarMQTT();
  }
+ controle();
  if(estado != estado_ant){
-  if (estado_ant > 0){
+  if(estado == 1 and estado_ant == 0){ //está ligando o Ar 
+      Serial.println("Ligou o Ar");
       set_Ar(estado);
       estado_ant = estado;
-    }  
+      publicarEstadoNoTopico();
+      publicarBD();
+    }
+  if(estado > 1 and estado_ant != 0){ //está alterando a temperatura
+    Serial.print("Temperatura: ");
+    set_Ar(estado);
+    estado_ant = estado;
+    temperatura = estado;
+    Serial.println(temperatura);
+    publicarTemperaturaacNoTopico();
+    publicarBD();
+    }
+  if(estado == 0 and estado_ant != 0){ //está desligando o Ar 
+    Serial.println("Desligou o Ar");
+    set_Ar(estado);
+    estado_ant = estado;
+    publicarEstadoNoTopico();
+    publicarBD();
+    }
   }
   client.loop();
+  yield();
 }
 
 
