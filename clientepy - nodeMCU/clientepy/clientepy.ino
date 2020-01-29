@@ -85,9 +85,9 @@ void loop() {
   }else{
     client.println(" ");
     client.println("0"); //tipo de node
-    client.println(4); //id do node
+    client.println(3); //id do node
     client.println(temperatura); 
-    client.println(Irms); //Corrente 
+    client.println(0); //Corrente 
     client.println(umidade); 
     client.println("fim");
     client.stop(); 

@@ -61,7 +61,7 @@ const char* MQTT_USERNAME = "mqtt_user";
 const char* MQTT_PASSWORD = "mqtt_ufpi";
 PubSubClient client(nodemcuClient);
 const char* topicoEstado = "controleAc/Disnel/LD";
-const char* topicoTemperatura = "controleAc/Disnel/temperatura";
+const char* topicoTemperatura = "controleAc/Disnel/temperatura2";
 const char* topicoEstadoBD = "controleAc/Disnel/estadoBD";
 const char* topicoTemperaturaBD = "controleAc/Disnel/temperaturaBD";
 
@@ -276,6 +276,7 @@ void loop() {
       set_Ar(estado);
       estado_ant = estado;
       publicarEstadoNoTopico();
+      publicarTemperaturaacNoTopico();
       publicarBD();
     }
   if(estado > 1 and estado_ant != 0){ //está alterando a temperatura
