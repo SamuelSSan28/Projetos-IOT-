@@ -23,4 +23,32 @@
   - Modulos: Xbee V1, Adaptador do Xbee pro arduino
   - Extra: Software XCTU para configuração dos XBEE
   
+## Server_TCP - nodeMCU
+  - Cria um servidor local (TCP/IP) em um ESP8266 
+  - Microntrolador: ESP8266.
+ 
+ ## clientepy - nodeMCU
+  - Envia dados de corrente e temperatura para um servidor 
+  - Microntrolador: ESP8266.
+  - Modulos: Sensor DHT22, Sensor SCT013.
   
+  ## controle_wifi_MQTT
+  - Clona um controle de ar condicionado e registra o uso em um BD utilizando o protocolo MQTT
+  - Microntrolador: ESP8266
+  - Modulos: Receptor IR, LED IR, Controle
+
+ ## py2
+  - Envia dados de temperatura e humidade para um servidor 
+  - Microntrolador: ESP8266
+  - Modulos: Sensor DHT22, Sensor SCT013.
+  
+## py2
+  - Envia dados de temperatura e humidade para um servidor 
+  - Microntrolador: ESP8266
+  - Modulos: Sensor DHT22
+  
+## sensor_de_corrente
+  - Envia dados de corrente para um servidor 
+  - Microntrolador: ESP8266
+  - Modulos: Sensor SCT013
+  - Extra: Codigo Adaptado pra o ESP8266 baseado no do [xxx][https://portal.vidadesilicio.com.br/sct-013-sensor-de-corrente-alternada/]
