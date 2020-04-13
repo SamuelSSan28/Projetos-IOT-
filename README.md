@@ -51,4 +51,4 @@
   - Envia dados de corrente para um servidor 
   - Microntrolador: ESP8266
   - Modulos: Sensor SCT013
-  - Extra: Codigo Adaptado pra o ESP8266 baseado no do [xxx][https://portal.vidadesilicio.com.br/sct-013-sensor-de-corrente-alternada/]
+  - Extra: Codigo Adaptado pra o ESP8266 baseado no do [Portal Vida de Silicio](https://portal.vidadesilicio.com.br/sct-013-sensor-de-corrente-alternada/)
