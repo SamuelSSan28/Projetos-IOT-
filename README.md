@@ -27,12 +27,12 @@
   - Cria um servidor local (TCP/IP) em um ESP8266 
   - Microntrolador: ESP8266.
  
- ## clientepy - nodeMCU
+ ## Clientepy - nodeMCU
   - Envia dados de corrente e temperatura para um servidor 
   - Microntrolador: ESP8266.
   - Modulos: Sensor DHT22, Sensor SCT013.
   
-  ## controle_wifi_MQTT
+  ## Controle_wifi_MQTT
   - Clona um controle de ar condicionado e registra o uso em um BD utilizando o protocolo MQTT
   - Microntrolador: ESP8266
   - Modulos: Receptor IR, LED IR
