@@ -35,20 +35,24 @@
   ## controle_wifi_MQTT
   - Clona um controle de ar condicionado e registra o uso em um BD utilizando o protocolo MQTT
   - Microntrolador: ESP8266
-  - Modulos: Receptor IR, LED IR, Controle
+  - Modulos: Receptor IR, LED IR
+  - Broker: Mosquitto
 
- ## py2
+ ## Py2
   - Envia dados de temperatura e humidade para um servidor 
   - Microntrolador: ESP8266
   - Modulos: Sensor DHT22, Sensor SCT013.
   
-## py2
-  - Envia dados de temperatura e humidade para um servidor 
-  - Microntrolador: ESP8266
-  - Modulos: Sensor DHT22
-  
-## sensor_de_corrente
+## Sensor_de_corrente
   - Envia dados de corrente para um servidor 
   - Microntrolador: ESP8266
   - Modulos: Sensor SCT013
-  - Extra: Codigo Adaptado pra o ESP8266 baseado no do [Portal Vida de Silicio](https://portal.vidadesilicio.com.br/sct-013-sensor-de-corrente-alternada/)
+  - Extra: Código Adaptado pra o ESP8266 baseado no do [Portal Vida de Silicio](https://portal.vidadesilicio.com.br/sct-013-sensor-de-corrente-alternada/)
+
+## Template_sensor_ppgccufpi
+  - Clona um controle de ar condicionado e registra o uso em um BD utilizando o protocolo MQTT/Controle com IR 
+  - Microntrolador: ESP8266
+  - Modulos: Receptor IR, LED IR, Controle
+  - Extra: App MQTT Dash para enviar comandos pelo celular
+  - Broker: Mosquitto
+  
